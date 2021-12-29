@@ -1,0 +1,5 @@
+
+killall -9  Python
+python3 convert.py
+python3 -m http.server &
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://localhost:8000/x.html
