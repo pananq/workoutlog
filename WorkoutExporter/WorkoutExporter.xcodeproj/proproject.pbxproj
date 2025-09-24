@@ -1,0 +1,48 @@
+2D0D8A3B28F94F4000A3C1C6 /* Debug */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+        CODE_SIGN_ENTITLEMENTS = WorkoutExport/WorkoutExport.entitlements;
+        CODE_SIGN_STYLE = Automatic;
+        CURRENT_PROJECT_VERSION = 1;
+        DEVELOPMENT_TEAM = "";
+        ENABLE_USER_SCRIPT_SANDBOXING = YES;
+        INFOPLIST_FILE = Info.plist;
+        IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+        LD_RUNPATH_SEARCH_PATHS = (
+          "$(inherited)",
+          "@executable_path/Frameworks",
+        );
+        MARKETING_VERSION = 1.0;
+        PRODUCT_BUNDLE_IDENTIFIER = com.example.WorkoutExport;
+        PRODUCT_NAME = "$(TARGET_NAME)";
+        SWIFT_VERSION = 5.0;
+        TARGETED_DEVICE_FAMILY = "1,2";
+      };
+      name = Debug;
+    };
+    2D0D8A3C28F94F4000A3C1C6 /* Release */ = {
+      isa = XCBuildConfiguration;
+      buildSettings = {
+        ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+        CODE_SIGN_ENTITLEMENTS = WorkoutExport/WorkoutExport.entitlements;
+        CODE_SIGN_STYLE = Automatic;
+        CURRENT_PROJECT_VERSION = 1;
+        DEVELOPMENT_TEAM = "";
+        ENABLE_USER_SCRIPT_SANDBOXING = YES;
+        INFOPLIST_FILE = Info.plist;
+        IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+        LD_RUNPATH_SEARCH_PATHS = (
+          "$(inherited)",
+          "@executable_path/Frameworks",
+        );
+        MARKETING_VERSION = 1.0;
+        PRODUCT_BUNDLE_IDENTIFIER = com.example.WorkoutExport;
+        PRODUCT_NAME = "$(TARGET_NAME)";
+        SWIFT_VERSION = 5.0;
+        TARGETED_DEVICE_FAMILY = "1,2";
+      };
+      name = Release;
+    };

@@ -1,0 +1,68 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: #666;
+    font-weight: normal;
+}
+
+.workout-grid {
+    display: grid;
+    grid-template-columns: 50px repeat(12, 1fr);
+    gap: 5px;
+    margin-bottom: 40px;
+}
+
+.month-header {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.day-label {
+    color: #666;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.workout-cell {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    margin: 2px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+/* 运动类型对应的颜色 */
+.HIIT { background-color: #4682B4; }
+.Swim { background-color: #FFD700; }
+.Soccer { background-color: #FF6B6B; }
+.Surfskate { background-color: #66CDAA; }
+.Others { background-color: #FFA500; }
+.empty { background-color: #f0f0f0; } 
