@@ -16,6 +16,7 @@
 		CBA947B82E82FE2E0015493A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947B02E82FE2E0015493A /* ViewController.swift */; };
 		CBA947B92E82FE2E0015493A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947A52E82FE2E0015493A /* AppDelegate.swift */; };
 		CBA947BA2E82FE2E0015493A /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947AC2E82FE2E0015493A /* HealthManager.swift */; };
+		CBA947BC2E82FE2E0015493A /* HeatmapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		CBA947AF2E82FE2E0015493A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CBA947B02E82FE2E0015493A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CBA947B12E82FE2E0015493A /* WorkoutExporter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WorkoutExporter.entitlements; sourceTree = "<group>"; };
+		CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 				CBA947AF2E82FE2E0015493A /* SceneDelegate.swift */,
 				CBA947B02E82FE2E0015493A /* ViewController.swift */,
 				CBA947B12E82FE2E0015493A /* WorkoutExporter.entitlements */,
+				CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */,
 				2D0D8A2728F94F4000A3C1C6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -153,6 +156,7 @@
 				CBA947B82E82FE2E0015493A /* ViewController.swift in Sources */,
 				CBA947B92E82FE2E0015493A /* AppDelegate.swift in Sources */,
 				CBA947BA2E82FE2E0015493A /* HealthManager.swift in Sources */,
+				CBA947BC2E82FE2E0015493A /* HeatmapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,6 +24,8 @@
 	<string>此应用需要访问您的健身数据来导出为CSV文件</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>此应用需要写入健身数据</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>此应用需要访问您的相册来保存健身热力图图片</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

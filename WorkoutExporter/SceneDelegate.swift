@@ -8,7 +8,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // 使用此方法可选择性地配置UIWindow `window`并将其附加到提供的UIWindowScene `scene`。
         // 如果使用storyboard，`window`属性将自动初始化并附加到scene。
         // 此委托并不表示连接scene或session是新的（请参阅`application:configurationForConnectingSceneSession`）。
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        // 创建窗口
+        window = UIWindow(windowScene: windowScene)
+        
+        // 创建主视图控制器
+        let viewController = ViewController()
+        
+        // 创建导航控制器并将主视图控制器作为根视图控制器
+        let navigationController = UINavigationController(rootViewController: viewController)
+        
+        // 设置导航栏样式
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+        navigationController.navigationBar.standardAppearance = appearance
+        navigationController.navigationBar.scrollEdgeAppearance = appearance
+        
+        // 设置窗口的根视图控制器
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

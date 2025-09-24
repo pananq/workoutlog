@@ -256,4 +256,69 @@ class HealthManager {
             return nil
         }
     }
+    
+    // 新增：生成热力图数据
+    func generateHeatmapData(completion: @escaping ([String: [String: Int]]?, Error?) -> Void) {
+        fetchWorkouts { workouts, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            guard let workouts = workouts else {
+                completion(nil, NSError(domain: "HealthManager", code: 0, userInfo: [NSLocalizedDescriptionKey: "没有找到健身记录"]))
+                return
+            }
+            
+            var heatmapData: [String: [String: Int]] = [:]
+            
+            for workout in workouts {
+                let calendar = Calendar.current
+                let year = calendar.component(.year, from: workout.startDate)
+                let yearKey = "\(year)"
+                
+                // 将日期转换为Unix时间戳（当天的开始时间）
+                let dateComponents = calendar.dateComponents([.year, .month, .day], from: workout.startDate)
+                guard let date = calendar.date(from: dateComponents) else { continue }
+                let timestamp = "\(Int(date.timeIntervalSince1970))"
+                
+                // 根据健身类型分配数值（1-4）
+                let workoutValue = self.workoutTypeToHeatmapValue(workout.workoutActivityType)
+                
+                if heatmapData[yearKey] == nil {
+                    heatmapData[yearKey] = [:]
+                }
+                
+                // 如果同一天有多个健身记录，取数值最大的
+                if let existingValue = heatmapData[yearKey]?[timestamp] {
+                    heatmapData[yearKey]?[timestamp] = max(existingValue, workoutValue)
+                } else {
+                    heatmapData[yearKey]?[timestamp] = workoutValue
+                }
+            }
+            
+            completion(heatmapData, nil)
+        }
+    }
+    
+    // 健身类型转换为热力图数值（1-5）
+    private func workoutTypeToHeatmapValue(_ type: HKWorkoutActivityType) -> Int {
+        switch type {
+        case .highIntensityIntervalTraining:
+            return 1  // HIIT
+        case .swimming:
+            return 2  // 游泳
+        case .soccer:
+            return 3  // 足球
+        case .surfingSports, .skatingSports:
+            return 4  // 滑板类
+        default:
+            return 5  // 其他（包括run/walk）
+        }
+    }
+    
+    // 新增：获取热力图的图例描述
+    func getHeatmapLegend() -> [String] {
+        return ["HIIT", "Swim", "Soccer", "Surfskate", "Others"]
+    }
 }

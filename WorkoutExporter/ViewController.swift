@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "将您的Apple Health健身记录导出为CSV文件"
+        label.text = "将您的Apple Health健身记录导出为CSV文件或查看热力图"
         label.font = UIFont.systemFont(ofSize: 16)
         label.textColor = .gray
         label.textAlignment = .center
@@ -73,6 +73,18 @@ class ViewController: UIViewController {
         return button
     }()
     
+    // 新增：热力图按钮
+    private let heatmapButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("查看热力图", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        button.backgroundColor = .systemGreen
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 10
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private let statusLabel: UILabel = {
         let label = UILabel()
         label.text = "准备就绪"
@@ -107,6 +119,7 @@ class ViewController: UIViewController {
         view.addSubview(endDateLabel)
         view.addSubview(endDatePicker)
         view.addSubview(exportButton)
+        view.addSubview(heatmapButton)
         view.addSubview(statusLabel)
         view.addSubview(activityIndicator)
         
@@ -140,7 +153,12 @@ class ViewController: UIViewController {
             exportButton.widthAnchor.constraint(equalToConstant: 200),
             exportButton.heightAnchor.constraint(equalToConstant: 50),
             
-            statusLabel.topAnchor.constraint(equalTo: exportButton.bottomAnchor, constant: 20),
+            heatmapButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            heatmapButton.topAnchor.constraint(equalTo: exportButton.bottomAnchor, constant: 20),
+            heatmapButton.widthAnchor.constraint(equalToConstant: 200),
+            heatmapButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            statusLabel.topAnchor.constraint(equalTo: heatmapButton.bottomAnchor, constant: 20),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
@@ -156,6 +174,7 @@ class ViewController: UIViewController {
     
     private func setupActions() {
         exportButton.addTarget(self, action: #selector(exportButtonTapped), for: .touchUpInside)
+        heatmapButton.addTarget(self, action: #selector(heatmapButtonTapped), for: .touchUpInside)
     }
     
     @objc private func exportButtonTapped() {
@@ -168,12 +187,12 @@ class ViewController: UIViewController {
         let healthStore = HKHealthStore()
         let workoutType = HKObjectType.workoutType()
         
-        healthStore.getRequestStatusForAuthorization(toShare: [], read: [workoutType]) { status, error in
+        healthStore.getRequestStatusForAuthorization(toShare: [], read: [workoutType]) { [weak self] status, error in
             DispatchQueue.main.async {
                 if status == .unnecessary {
-                    self.startExportProcess()
+                    self?.startExportProcess()
                 } else {
-                    self.showAlert(title: "需要授权", message: "请前往设置 > 健康 > 数据访问与设备，授予此应用访问健身数据的权限")
+                    self?.showAlert(title: "需要授权", message: "请前往设置 > 健康 > 数据访问与设备，授予此应用访问健身数据的权限")
                 }
             }
         }
@@ -183,6 +202,7 @@ class ViewController: UIViewController {
         activityIndicator.startAnimating()
         statusLabel.text = "正在导出健身数据..."
         exportButton.isEnabled = false
+        heatmapButton.isEnabled = false
         
         // 获取选择的日期范围
         let startDate = startDatePicker.date
@@ -192,6 +212,7 @@ class ViewController: UIViewController {
         if startDate > endDate {
             activityIndicator.stopAnimating()
             exportButton.isEnabled = true
+            heatmapButton.isEnabled = true
             showAlert(title: "错误", message: "开始日期不能晚于结束日期")
             return
         }
@@ -200,6 +221,7 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 self?.activityIndicator.stopAnimating()
                 self?.exportButton.isEnabled = true
+                self?.heatmapButton.isEnabled = true
                 
                 if let error = error {
                     self?.statusLabel.text = "导出失败: \(error.localizedDescription)"
@@ -224,6 +246,32 @@ class ViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    @objc private func heatmapButtonTapped() {
+        // 检查HealthKit授权状态
+        guard HKHealthStore.isHealthDataAvailable() else {
+            showAlert(title: "错误", message: "HealthKit不可用")
+            return
+        }
+        
+        let healthStore = HKHealthStore()
+        let workoutType = HKObjectType.workoutType()
+        
+        healthStore.getRequestStatusForAuthorization(toShare: [], read: [workoutType]) { [weak self] status, error in
+            DispatchQueue.main.async {
+                if status == .unnecessary {
+                    self?.navigateToHeatmap()
+                } else {
+                    self?.showAlert(title: "需要授权", message: "请前往设置 > 健康 > 数据访问与设备，授予此应用访问健身数据的权限")
+                }
+            }
+        }
+    }
+    
+    private func navigateToHeatmap() {
+        let heatmapVC = HeatmapViewController()
+        navigationController?.pushViewController(heatmapVC, animated: true)
     }
     
     private func shareCSVFile(fileURL: URL) {

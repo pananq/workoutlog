@@ -136,7 +136,7 @@ var CalHeatMap = function () {
 		legend: [10, 20, 30, 40],
 
 		// Description for the legend
-		legendDesc: ["HIIT", "Swim", "Soccer", "Walk", "Others"],
+		//legendDesc: ["HIIT", "Swim", "Soccer", "Surfskate", "Others"],
 		totalCntByLegendIdx: [0, 0, 0, 0, 0],
 		legendDetailInfo: [],
 

@@ -2,6 +2,9 @@
 
 .cal-heatmap-container {
 	display: block;
+	background-color:#fcfafa;
+	padding: 20px;
+	/*border: 1px solid #ededed;*/
 }
 
 .cal-heatmap-container .graph
@@ -17,8 +20,9 @@
 
 .cal-heatmap-container .graph-title
 {
-	fill: #999;
-	font-size: 12px
+	fill: rgb(94, 93, 93);
+	font-size: 12px;
+	font-weight: bold
 }
 
 .cal-heatmap-container .graph, .cal-heatmap-container .graph-legend rect {
