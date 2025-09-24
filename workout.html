@@ -1,0 +1,121 @@
+<html>
+<meta http-equiv="Access-Control-Allow-Origin" content="*" >
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="cal-heatmap.js"></script>
+<link rel="stylesheet" href="cal-heatmap.css" />
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<style id="dynamic-styles"></style>
+<div id="heatmap-container"></div>
+
+<script type="text/javascript">
+// 只在一处定义年份数据
+const yearData = {
+    2024: {"1704470400": 1, "1704556800": 4, /* ... 其他2024数据 ... */},
+    2023: {"1672588800": 1, "1672675200": 1, /* ... 其他2023数据 ... */},
+    2022: {"1641052800": 1, "1641830400": 1, /* ... 其他2022数据 ... */},
+    2021: {"1609430400": 2, "1609516800": 1, /* ... 其他2021数据 ... */}
+};
+
+// 从yearData获取年份列表，并按降序排序
+const years = Object.keys(yearData)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+// 创建样式和容器
+function createContainers() {
+    // 生成CSS样式
+    const styles = years.map((year, index) => {
+        // 根据年份数量动态计算 opacity
+        const minOpacity = 0.3; // 设置最小透明度
+        const opacityStep = years.length <= 4 
+            ? 0.2 
+            : (1 - minOpacity) / (years.length - 1); // 动态计算步长
+        const opacity = Math.max(1 - index * opacityStep, minOpacity);
+        
+        return `#cal-heatmap-${year} { opacity: ${opacity.toFixed(2)}; margin: 30px; }`;
+    }).join('\n');
+    
+    document.getElementById('dynamic-styles').textContent = styles;
+    
+    // 生成容器DIVs
+    const container = document.getElementById('heatmap-container');
+    years.forEach(year => {
+        const div = document.createElement('div');
+        div.id = `cal-heatmap-${year}`;
+        container.appendChild(div);
+    });
+}
+
+// 计算有记录的天数
+function getRecordedDays(data) {
+    return Object.keys(data).length;
+}
+
+// 获取全年天数
+function getDaysInYear(year) {
+    return ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) ? 366 : 365;
+}
+
+// 创建热力图的函数
+function createHeatmap(year) {
+    const legendDesc = (year === 2021) 
+        ? ["HIIT", "Swim", "Soccer", "Walk", "Others"]
+        : ["HIIT", "Swim", "Soccer", "Surfskate", "Others"];
+
+    const recordedDays = getRecordedDays(yearData[year]);
+    const totalDays = getDaysInYear(year);
+    const percentage = (recordedDays / totalDays * 100).toFixed(1);
+    
+    var cal = new CalHeatMap();
+    cal.init({
+        itemSelector: `#cal-heatmap-${year}`,
+        domain: "year",
+        subDomain: "day",
+        cellSize: 10,
+        cellRadius: 1,
+        domainLabelFormat: "",
+        domainMargin: [40,0,0,40],
+        range: 1,
+        legend: [1, 2, 3, 4],
+        legendHorizontalPosition: "center",
+        legendCellSize: 10,
+        legendDesc: legendDesc,
+        graphTitle: `pananq's ${year} workout log (${recordedDays}/${totalDays}, ${percentage}%)`,
+        start: new Date(year, 0),
+        data: yearData[year]
+    });
+}
+
+// 在所有热力图渲染完成后，添加保存按钮和保存功能
+function addSaveButton() {
+    const button = document.createElement('button');
+    button.innerHTML = 'Save as Image';
+    button.style.margin = '20px';
+    button.onclick = async () => {
+        const container = document.getElementById('heatmap-container');
+        const canvas = await html2canvas(container);
+        
+        // 转换为图片并下载
+        const link = document.createElement('a');
+        link.download = 'workout-heatmap.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+    document.body.appendChild(button);
+}
+
+// 修改初始化代码，确保在热力图都渲染完成后添加按钮
+createContainers();
+Promise.all(years.map(year => {
+    return new Promise(resolve => {
+        createHeatmap(year);
+        // 给一些渲染时间
+        setTimeout(resolve, 500);
+    });
+})).then(() => {
+    addSaveButton();
+});
+</script>
+
+</html>
