@@ -261,7 +261,6 @@ class HeatmapViewController: UIViewController {
     }
     
     private func generateYearHeatmapByWeek(yearData: [String: Int], year: Int) -> String {
-        var weekHTML = ""
         let calendar = Calendar.current
         
         // 获取一年的第一天
