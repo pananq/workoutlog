@@ -154,7 +154,7 @@ function addSaveButton() {
             const container = document.getElementById('heatmap-container');
             
             // 等待一下确保所有内容都渲染完成
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 300));
             
             // 使用更好的配置进行截图
             const canvas = await html2canvas(container, {
@@ -194,18 +194,18 @@ function addSaveButton() {
     document.body.appendChild(button);
 }
 
-// 修改初始化代码，确保在热力图都渲染完成后添加按钮
+// 修改初始化代码，优化加载速度
 async function initializeHeatmaps() {
     try {
         // 创建容器
         createContainers();
         
-        // 逐个创建热力图，确保每个都完全渲染
+        // 逐个创建热力图，减少等待时间
         for (const year of years) {
             await new Promise(resolve => {
                 createHeatmap(year);
-                // 给足够的渲染时间
-                setTimeout(resolve, 800);
+                // 减少渲染等待时间
+                setTimeout(resolve, 200);
             });
         }
         
@@ -213,8 +213,8 @@ async function initializeHeatmaps() {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('heatmap-container').style.display = 'block';
         
-        // 再等待一下确保所有样式都应用完成
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // 减少最终等待时间
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // 添加保存按钮
         addSaveButton();
