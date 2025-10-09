@@ -1,5 +1,5 @@
 
 killall -9  Python
-python3 convert.py
+python3 "/Users/pananq/微云同步助手(15313697)/workoutlog/csv_to_json.py" --csv "/Users/pananq/微云同步助手(15313697)/workoutlog/workout_export_1760013031.98248.csv" --year 2025 --metric type --out "/Users/pananq/微云同步助手(15313697)/workoutlog/2025.json"
 python3 -m http.server &
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://localhost:8000/x.html
