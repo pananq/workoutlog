@@ -1,9 +1,16 @@
+<!DOCTYPE html>
 <html>
-<meta http-equiv="Access-Control-Allow-Origin" content="*" >
-<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-<script type="text/javascript" src="cal-heatmap.js"></script>
-<link rel="stylesheet" href="cal-heatmap.css" />
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>运动热力图</title>
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="cal-heatmap.js"></script>
+    <link rel="stylesheet" href="cal-heatmap.css" />
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
 
 <style id="dynamic-styles"></style>
 <style>
@@ -230,5 +237,5 @@ async function initializeHeatmaps() {
 // 启动初始化
 initializeHeatmaps();
 </script>
-
+</body>
 </html>

@@ -85,6 +85,18 @@ class ViewController: UIViewController {
         return button
     }()
     
+    // 新增：本地HTML热力图按钮
+    private let localHtmlButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("本地HTML热力图", for: .normal)
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
+        button.backgroundColor = .systemOrange
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 10
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     private let statusLabel: UILabel = {
         let label = UILabel()
         label.text = "准备就绪"
@@ -120,6 +132,7 @@ class ViewController: UIViewController {
         view.addSubview(endDatePicker)
         view.addSubview(exportButton)
         view.addSubview(heatmapButton)
+        view.addSubview(localHtmlButton)
         view.addSubview(statusLabel)
         view.addSubview(activityIndicator)
         
@@ -158,7 +171,12 @@ class ViewController: UIViewController {
             heatmapButton.widthAnchor.constraint(equalToConstant: 200),
             heatmapButton.heightAnchor.constraint(equalToConstant: 50),
             
-            statusLabel.topAnchor.constraint(equalTo: heatmapButton.bottomAnchor, constant: 20),
+            localHtmlButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            localHtmlButton.topAnchor.constraint(equalTo: heatmapButton.bottomAnchor, constant: 20),
+            localHtmlButton.widthAnchor.constraint(equalToConstant: 200),
+            localHtmlButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            statusLabel.topAnchor.constraint(equalTo: localHtmlButton.bottomAnchor, constant: 20),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
@@ -175,6 +193,7 @@ class ViewController: UIViewController {
     private func setupActions() {
         exportButton.addTarget(self, action: #selector(exportButtonTapped), for: .touchUpInside)
         heatmapButton.addTarget(self, action: #selector(heatmapButtonTapped), for: .touchUpInside)
+        localHtmlButton.addTarget(self, action: #selector(localHtmlButtonTapped), for: .touchUpInside)
     }
     
     @objc private func exportButtonTapped() {
@@ -201,8 +220,9 @@ class ViewController: UIViewController {
     private func startExportProcess() {
         activityIndicator.startAnimating()
         statusLabel.text = "正在导出健身数据..."
-        exportButton.isEnabled = false
-        heatmapButton.isEnabled = false
+                exportButton.isEnabled = false
+                heatmapButton.isEnabled = false
+                localHtmlButton.isEnabled = false
         
         // 获取选择的日期范围
         let startDate = startDatePicker.date
@@ -222,6 +242,7 @@ class ViewController: UIViewController {
                 self?.activityIndicator.stopAnimating()
                 self?.exportButton.isEnabled = true
                 self?.heatmapButton.isEnabled = true
+                self?.localHtmlButton.isEnabled = true
                 
                 if let error = error {
                     self?.statusLabel.text = "导出失败: \(error.localizedDescription)"
@@ -272,6 +293,11 @@ class ViewController: UIViewController {
     private func navigateToHeatmap() {
         let heatmapVC = HeatmapViewController()
         navigationController?.pushViewController(heatmapVC, animated: true)
+    }
+    
+    @objc private func localHtmlButtonTapped() {
+        let localHtmlVC = LocalHtmlViewController()
+        navigationController?.pushViewController(localHtmlVC, animated: true)
     }
     
     private func shareCSVFile(fileURL: URL) {

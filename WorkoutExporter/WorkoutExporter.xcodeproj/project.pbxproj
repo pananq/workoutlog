@@ -12,11 +12,15 @@
 		CBA947B42E82FE2E0015493A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CBA947AD2E82FE2E0015493A /* Info.plist */; };
 		CBA947B52E82FE2E0015493A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBA947AA2E82FE2E0015493A /* Main.storyboard */; };
 		CBA947B62E82FE2E0015493A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBA947A82E82FE2E0015493A /* LaunchScreen.storyboard */; };
+		CBA947BF2E82FE2E0015493A /* workout.html in Resources */ = {isa = PBXBuildFile; fileRef = CBA947C02E82FE2E0015493A /* workout.html */; };
+		CBA947C12E82FE2E0015493A /* cal-heatmap.js in Resources */ = {isa = PBXBuildFile; fileRef = CBA947C22E82FE2E0015493A /* cal-heatmap.js */; };
+		CBA947C32E82FE2E0015493A /* cal-heatmap.css in Resources */ = {isa = PBXBuildFile; fileRef = CBA947C42E82FE2E0015493A /* cal-heatmap.css */; };
 		CBA947B72E82FE2E0015493A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947AF2E82FE2E0015493A /* SceneDelegate.swift */; };
 		CBA947B82E82FE2E0015493A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947B02E82FE2E0015493A /* ViewController.swift */; };
 		CBA947B92E82FE2E0015493A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947A52E82FE2E0015493A /* AppDelegate.swift */; };
 		CBA947BA2E82FE2E0015493A /* HealthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947AC2E82FE2E0015493A /* HealthManager.swift */; };
 		CBA947BC2E82FE2E0015493A /* HeatmapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */; };
+		CBA947BD2E82FE2E0015493A /* LocalHtmlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA947BE2E82FE2E0015493A /* LocalHtmlViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,10 @@
 		CBA947B02E82FE2E0015493A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CBA947B12E82FE2E0015493A /* WorkoutExporter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WorkoutExporter.entitlements; sourceTree = "<group>"; };
 		CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatmapViewController.swift; sourceTree = "<group>"; };
+		CBA947BE2E82FE2E0015493A /* LocalHtmlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalHtmlViewController.swift; sourceTree = "<group>"; };
+		CBA947C02E82FE2E0015493A /* workout.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = workout.html; sourceTree = "<group>"; };
+		CBA947C22E82FE2E0015493A /* cal-heatmap.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = cal-heatmap.js; sourceTree = "<group>"; };
+		CBA947C42E82FE2E0015493A /* cal-heatmap.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = cal-heatmap.css; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +66,10 @@
 				CBA947B02E82FE2E0015493A /* ViewController.swift */,
 				CBA947B12E82FE2E0015493A /* WorkoutExporter.entitlements */,
 				CBA947BB2E82FE2E0015493A /* HeatmapViewController.swift */,
+				CBA947BE2E82FE2E0015493A /* LocalHtmlViewController.swift */,
+				CBA947C02E82FE2E0015493A /* workout.html */,
+				CBA947C22E82FE2E0015493A /* cal-heatmap.js */,
+				CBA947C42E82FE2E0015493A /* cal-heatmap.css */,
 				2D0D8A2728F94F4000A3C1C6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -142,6 +154,9 @@
 				CBA947B32E82FE2E0015493A /* Assets.xcassets in Resources */,
 				CBA947B52E82FE2E0015493A /* Main.storyboard in Resources */,
 				CBA947B62E82FE2E0015493A /* LaunchScreen.storyboard in Resources */,
+				CBA947BF2E82FE2E0015493A /* workout.html in Resources */,
+				CBA947C12E82FE2E0015493A /* cal-heatmap.js in Resources */,
+				CBA947C32E82FE2E0015493A /* cal-heatmap.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,6 +172,7 @@
 				CBA947B92E82FE2E0015493A /* AppDelegate.swift in Sources */,
 				CBA947BA2E82FE2E0015493A /* HealthManager.swift in Sources */,
 				CBA947BC2E82FE2E0015493A /* HeatmapViewController.swift in Sources */,
+				CBA947BD2E82FE2E0015493A /* LocalHtmlViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
