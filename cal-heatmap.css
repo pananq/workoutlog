@@ -12,11 +12,17 @@
 	font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
 }
 
-.cal-heatmap-container .graph-label
+.cal-heatmap-container .graph-label,
+.cal-heatmap-container text.graph-label,
+.cal-heatmap-container .graph-lable,
+.cal-heatmap-container text.graph-lable
 {
 	fill: #999;
-	font-size: 10px
+	font-size: 10px;
+	dominant-baseline: hanging;
+	alignment-baseline: hanging;
 }
+
 
 .cal-heatmap-container .graph-title
 {
@@ -28,6 +34,19 @@
 .cal-heatmap-container .graph, .cal-heatmap-container .graph-legend rect {
 	shape-rendering: crispedges
 }
+
+/* 固定图例高度并居中文本 */
+.cal-heatmap-container .graph-legend rect {
+	height: 10px;
+}
+
+.cal-heatmap-container .graph-legend text,
+.cal-heatmap-container text.graph-legend-label {
+	font-size: 10px;
+	dominant-baseline: hanging;
+	alignment-baseline: hanging;
+}
+
 
 .cal-heatmap-container .graph-rect
 {

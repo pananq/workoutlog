@@ -23,7 +23,7 @@
     
     #heatmap-container {
         background-color: white;
-        padding: 20px;
+        padding: 2px;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         width: fit-content;
@@ -33,7 +33,7 @@
     }
     
     .heatmap-year {
-        margin: 30px 0;
+        margin: 10px 0;
         page-break-inside: avoid;
         width: fit-content;
         display: block;
@@ -150,48 +150,133 @@ function createHeatmap(year, data) {
     });
 }
 
+// 在将SVG序列化为数据URL之前，将页面CSS内嵌到SVG中，避免样式丢失
+let __cachedCalHeatmapCss = null;
+async function getCalHeatmapCSSText() {
+    if (__cachedCalHeatmapCss) return __cachedCalHeatmapCss;
+    try {
+        const res = await fetch('cal-heatmap.css', { cache: 'no-cache' });
+        const raw = await res.text();
+        // 将以 .cal-heatmap-container 开头的选择器去掉前缀，方便在独立SVG中生效
+        const adjusted = raw
+            .replace(/\.[ ]?cal-heatmap-container\s+/g, '')
+            // 去掉可能影响外观的容器背景/padding等，仅保留图形相关规则
+            .replace(/cal-heatmap-container\s*\{[\s\S]*?\}/g, '');
+        // 追加确保文本垂直居中的规则：导出时graph-label使用hanging对齐（与页面一致），同时兼容误拼写graph-lable
+        const extras = `\n.graph-label, .graph-lable, text.graph-label, text.graph-lable{dominant-baseline:hanging;alignment-baseline:hanging} \n.graph-legend text, text.graph-legend-label{dominant-baseline:hanging;alignment-baseline:hanging}\n`;
+        __cachedCalHeatmapCss = adjusted + extras;
+        return __cachedCalHeatmapCss;
+    } catch (e) {
+        console.warn('读取 cal-heatmap.css 失败，将仅使用内联属性', e);
+        return '';
+    }
+}
+
+function injectCssIntoSVG(svgEl, cssText) {
+    if (!cssText) return;
+    const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    styleEl.setAttribute('type', 'text/css');
+    styleEl.textContent = cssText;
+    // 插入到最前面，确保优先级更高
+    svgEl.insertBefore(styleEl, svgEl.firstChild);
+}
+
 // 在所有热力图渲染完成后，添加保存按钮和保存功能
 function addSaveButton() {
     const button = document.createElement('button');
     button.id = 'save-button';
     button.innerHTML = '💾 保存为图片';
+
+    // 采用“直接将每个 SVG 绘制到 Canvas”的方式，绕过 html2canvas 对 SVG 的兼容问题
     button.onclick = async () => {
         try {
-            // 显示加载状态
             button.innerHTML = '⏳ 生成中...';
             button.disabled = true;
-            
+
             const container = document.getElementById('heatmap-container');
-            
-            // 等待一下确保所有内容都渲染完成
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
-            // 使用更好的配置进行截图
-            const canvas = await html2canvas(container, {
-                backgroundColor: '#ffffff',
-                scale: 2, // 提高分辨率
-                useCORS: true,
-                allowTaint: true,
-                width: container.scrollWidth,
-                height: container.scrollHeight,
-                scrollX: 0,
-                scrollY: 0
-            });
-            
-            // 转换为图片并下载
+            // 等待一次宏任务，确保布局稳定
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const containerRect = container.getBoundingClientRect();
+            const scale = 2; // 导出 2 倍尺寸
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.ceil(containerRect.width * scale);
+            canvas.height = Math.ceil(containerRect.height * scale);
+            const ctx = canvas.getContext('2d');
+            // 白底
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 等比缩放到视觉坐标系
+            ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+            // 读取并缓存CSS文本，仅读取一次
+            const cssText = await getCalHeatmapCSSText();
+
+            // 绘制容器下所有年份的 SVG
+            const yearDivs = Array.from(container.querySelectorAll('.heatmap-year'));
+            for (const div of yearDivs) {
+                const svg = div.querySelector('svg');
+                if (!svg) continue;
+
+                // 读取该年份容器的透明度，使导出效果与页面一致
+                const divOpacity = parseFloat(getComputedStyle(div).opacity || '1');
+
+                // 使用实际渲染尺寸和位置
+                const svgRect = svg.getBoundingClientRect();
+                const x = svgRect.left - containerRect.left;
+                const y = svgRect.top - containerRect.top;
+                const w = svgRect.width;
+                const h = svgRect.height;
+
+                // 克隆并规范化 SVG，保证数据 URL 渲染正确
+                const cloned = svg.cloneNode(true);
+                cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                cloned.setAttribute('width', String(Math.round(w)));
+                cloned.setAttribute('height', String(Math.round(h)));
+                if (!cloned.getAttribute('viewBox')) {
+                    cloned.setAttribute('viewBox', `0 0 ${Math.round(w)} ${Math.round(h)}`);
+                }
+                // 避免非等比拉伸（与实际渲染一致）
+                cloned.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                // 将CSS规则直接内嵌到SVG
+                injectCssIntoSVG(cloned, cssText);
+
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(cloned);
+                const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+
+                // 等待图片加载后绘制
+                await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        try {
+                            // 应用每个年份的透明度
+                            const prevAlpha = ctx.globalAlpha;
+                            ctx.globalAlpha = isNaN(divOpacity) ? 1 : Math.max(0, Math.min(divOpacity, 1));
+                            ctx.drawImage(img, x, y, w, h);
+                            ctx.globalAlpha = prevAlpha;
+                            resolve();
+                        } catch (e) {
+                            reject(e);
+                        }
+                    };
+                    img.onerror = reject;
+                    img.src = svgDataUrl;
+                });
+            }
+
             const link = document.createElement('a');
             const currentDate = new Date().toISOString().split('T')[0];
             link.download = `workout-heatmap-${currentDate}.png`;
             link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
-            
-            // 恢复按钮状态
+
             button.innerHTML = '✅ 保存成功';
             setTimeout(() => {
                 button.innerHTML = '💾 保存为图片';
                 button.disabled = false;
-            }, 2000);
-            
+            }, 1600);
         } catch (error) {
             console.error('保存图片失败:', error);
             button.innerHTML = '❌ 保存失败';
