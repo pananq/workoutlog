@@ -181,6 +181,22 @@ function injectCssIntoSVG(svgEl, cssText) {
     svgEl.insertBefore(styleEl, svgEl.firstChild);
 }
 
+// Canvas 辅助：绘制圆角矩形路径，用于填充与剪裁
+function drawRoundedRectPath(ctx, x, y, w, h, r) {
+    const radius = Math.max(0, Math.min(r || 0, Math.min(w, h) / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+    ctx.lineTo(x + w, y + h - radius);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+    ctx.lineTo(x + radius, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
 // 在所有热力图渲染完成后，添加保存按钮和保存功能
 function addSaveButton() {
     const button = document.createElement('button');
@@ -204,11 +220,28 @@ function addSaveButton() {
             canvas.width = Math.ceil(containerRect.width * scale);
             canvas.height = Math.ceil(containerRect.height * scale);
             const ctx = canvas.getContext('2d');
-            // 白底
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // 等比缩放到视觉坐标系
+            
+            // 将坐标系缩放到视觉坐标（未缩放的单位为 CSS 像素）
             ctx.setTransform(scale, 0, 0, scale, 0, 0);
+
+            // 读取整体容器的圆角与背景色，并绘制圆角背景，同时设置剪裁，确保最终导出图片边缘为圆角
+            const contStyles = getComputedStyle(container);
+            const cBrAll = parseFloat(contStyles.borderRadius || '0') || 0;
+            const cBrTL = parseFloat(contStyles.borderTopLeftRadius || '0') || 0;
+            const cBrTR = parseFloat(contStyles.borderTopRightRadius || '0') || 0;
+            const cBrBR = parseFloat(contStyles.borderBottomRightRadius || '0') || 0;
+            const cBrBL = parseFloat(contStyles.borderBottomLeftRadius || '0') || 0;
+            const containerRadius = cBrAll || Math.max(cBrTL, cBrTR, cBrBR, cBrBL, 0);
+            const containerBg = (contStyles.backgroundColor && contStyles.backgroundColor !== 'rgba(0, 0, 0, 0)')
+                ? contStyles.backgroundColor
+                : '#ffffff';
+            
+            ctx.fillStyle = containerBg;
+            drawRoundedRectPath(ctx, 0, 0, containerRect.width, containerRect.height, containerRadius);
+            ctx.fill();
+            ctx.save();
+            drawRoundedRectPath(ctx, 0, 0, containerRect.width, containerRect.height, containerRadius);
+            ctx.clip();
 
             // 读取并缓存CSS文本，仅读取一次
             const cssText = await getCalHeatmapCSSText();
@@ -222,39 +255,107 @@ function addSaveButton() {
                 // 读取该年份容器的透明度，使导出效果与页面一致
                 const divOpacity = parseFloat(getComputedStyle(div).opacity || '1');
 
-                // 使用实际渲染尺寸和位置
+                // 找到Cal-HeatMap自身的容器（包含背景与padding）- 先尝试最近的祖先
+                const calContainer = (svg.closest && svg.closest('.cal-heatmap-container')) || div.querySelector('.cal-heatmap-container') || div;
+                const calStyles = getComputedStyle(calContainer);
+
+                // 分别读取四边padding；若不存在则为0（避免意外增加额外留白）
+                const padTop = Math.round(parseFloat(calStyles.paddingTop || '0')) || 0;
+                const padRight = Math.round(parseFloat(calStyles.paddingRight || '0')) || 0;
+                const padBottom = Math.round(parseFloat(calStyles.paddingBottom || '0')) || 0;
+                const padLeft = Math.round(parseFloat(calStyles.paddingLeft || '0')) || 0;
+
+                // 读取圆角半径：优先使用统一的 borderRadius，否则尝试四角值，默认0
+                const brAll = parseFloat(calStyles.borderRadius || '0') || 0;
+                const brTL = parseFloat(calStyles.borderTopLeftRadius || '0') || 0;
+                const brTR = parseFloat(calStyles.borderTopRightRadius || '0') || 0;
+                const brBR = parseFloat(calStyles.borderBottomRightRadius || '0') || 0;
+                const brBL = parseFloat(calStyles.borderBottomLeftRadius || '0') || 0;
+                const borderRadius = brAll || Math.max(brTL, brTR, brBR, brBL, 0);
+
+                // 背景色（例如#fcfafa），若为空则用白色
+                const bgColor = calStyles.backgroundColor && calStyles.backgroundColor !== 'rgba(0, 0, 0, 0)'
+                    ? calStyles.backgroundColor
+                    : '#ffffff';
+
+                // 使用实际渲染尺寸和位置（针对包含padding的cal-heatmap容器）
+                const calRect = calContainer.getBoundingClientRect();
+                const x = calRect.left - containerRect.left;
+                const y = calRect.top - containerRect.top;
+                const frameW = Math.round(calRect.width);
+                const frameH = Math.round(calRect.height);
+
+                // SVG本体尺寸（不含padding）用于放置在frame内部
                 const svgRect = svg.getBoundingClientRect();
-                const x = svgRect.left - containerRect.left;
-                const y = svgRect.top - containerRect.top;
-                const w = svgRect.width;
-                const h = svgRect.height;
+                const innerW = Math.round(svgRect.width);
+                const innerH = Math.round(svgRect.height);
 
                 // 克隆并规范化 SVG，保证数据 URL 渲染正确
                 const cloned = svg.cloneNode(true);
                 cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-                cloned.setAttribute('width', String(Math.round(w)));
-                cloned.setAttribute('height', String(Math.round(h)));
+                cloned.setAttribute('width', String(innerW));
+                cloned.setAttribute('height', String(innerH));
                 if (!cloned.getAttribute('viewBox')) {
-                    cloned.setAttribute('viewBox', `0 0 ${Math.round(w)} ${Math.round(h)}`);
+                    cloned.setAttribute('viewBox', `0 0 ${innerW} ${innerH}`);
                 }
-                // 避免非等比拉伸（与实际渲染一致）
                 cloned.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-                // 将CSS规则直接内嵌到SVG
                 injectCssIntoSVG(cloned, cssText);
 
+                // —— 创建外层frame，尺寸等于calContainer（含padding与背景），将SVG内容在其中偏移对应padding ——
+                const ns = 'http://www.w3.org/2000/svg';
+                const frame = document.createElementNS(ns, 'svg');
+                frame.setAttribute('xmlns', ns);
+                frame.setAttribute('width', String(frameW));
+                frame.setAttribute('height', String(frameH));
+                frame.setAttribute('viewBox', `0 0 ${frameW} ${frameH}`);
+
+                const bg = document.createElementNS(ns, 'rect');
+                bg.setAttribute('x', '0');
+                bg.setAttribute('y', '0');
+                bg.setAttribute('width', String(frameW));
+                bg.setAttribute('height', String(frameH));
+                bg.setAttribute('fill', bgColor);
+                // 圆角背景，体现 heatmap-container 的 border-radius
+                if (borderRadius > 0) {
+                    bg.setAttribute('rx', String(borderRadius));
+                    bg.setAttribute('ry', String(borderRadius));
+                }
+                frame.appendChild(bg);
+
+                // 使用 clipPath 让内容也遵循圆角裁剪，效果与 HTML 中 border-radius 一致
+                let clipId = `clip-rounded-${Math.random().toString(36).slice(2)}`;
+                const clip = document.createElementNS(ns, 'clipPath');
+                clip.setAttribute('id', clipId);
+                const clipRect = document.createElementNS(ns, 'rect');
+                clipRect.setAttribute('x', '0');
+                clipRect.setAttribute('y', '0');
+                clipRect.setAttribute('width', String(frameW));
+                clipRect.setAttribute('height', String(frameH));
+                if (borderRadius > 0) {
+                    clipRect.setAttribute('rx', String(borderRadius));
+                    clipRect.setAttribute('ry', String(borderRadius));
+                }
+                clip.appendChild(clipRect);
+                frame.appendChild(clip);
+
+                const g = document.createElementNS(ns, 'g');
+                g.setAttribute('transform', `translate(${padLeft}, ${padTop})`);
+                g.setAttribute('clip-path', `url(#${clipId})`);
+                g.appendChild(cloned);
+                frame.appendChild(g);
+
                 const serializer = new XMLSerializer();
-                const svgString = serializer.serializeToString(cloned);
+                const svgString = serializer.serializeToString(frame);
                 const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
 
-                // 等待图片加载后绘制
                 await new Promise((resolve, reject) => {
                     const img = new Image();
                     img.onload = () => {
                         try {
-                            // 应用每个年份的透明度
                             const prevAlpha = ctx.globalAlpha;
                             ctx.globalAlpha = isNaN(divOpacity) ? 1 : Math.max(0, Math.min(divOpacity, 1));
-                            ctx.drawImage(img, x, y, w, h);
+                            // 将frame整体绘制到cal-heatmap容器位置（包含其padding），margin由布局自然体现
+                            ctx.drawImage(img, x, y, frameW, frameH);
                             ctx.globalAlpha = prevAlpha;
                             resolve();
                         } catch (e) {
@@ -265,6 +366,9 @@ function addSaveButton() {
                     img.src = svgDataUrl;
                 });
             }
+
+            // 取消剪裁，恢复绘图状态
+            ctx.restore();
 
             const link = document.createElement('a');
             const currentDate = new Date().toISOString().split('T')[0];
